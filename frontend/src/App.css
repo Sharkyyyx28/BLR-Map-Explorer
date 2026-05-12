@@ -1,0 +1,44 @@
+@keyframes slide-in-left {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-in {
+    animation: slide-in-left 0.3s ease-out forwards;
+}
+
+/* Leaflet Popup Styling */
+.custom-popup .leaflet-popup-content-wrapper {
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.custom-popup .leaflet-popup-content {
+    margin: 12px;
+}
+
+.custom-popup .leaflet-popup-tip-container {
+    display: none;
+}
+
+/* Custom Marker Hover Effects */
+.custom-div-icon {
+    transition: transform 0.2s ease;
+}
+
+.custom-div-icon:hover {
+    transform: scale(1.2);
+    z-index: 1000 !important;
+}
+
+/* Selected Marker Fix */
+.selected-marker-icon {
+    z-index: 2000 !important;
+}

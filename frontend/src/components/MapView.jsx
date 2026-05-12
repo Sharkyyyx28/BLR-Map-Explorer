@@ -52,22 +52,42 @@ function ChangeView({ center, zoom }) {
     return null;
 }
 
-function MapView({ areas, loading }) {
+function MapView({ areas, loading, selectedArea, onAreaSelect }) {
     const defaultCenter = [12.9716, 77.5946]; 
-    const mapCenter = areas.length === 1 ? [areas[0].lat, areas[0].lng] : defaultCenter;
-    const mapZoom = areas.length === 1 ? 14 : 11;
+    
+    // Determine center and zoom based on state
+    const mapCenter = selectedArea ? [selectedArea.lat, selectedArea.lng] : 
+                      areas.length === 1 ? [areas[0].lat, areas[0].lng] : 
+                      defaultCenter;
+    
+    const mapZoom = selectedArea ? 15 : 
+                    areas.length === 1 ? 14 : 11;
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center h-[600px] bg-slate-50 text-slate-400 gap-4">
+            <div className="flex flex-col items-center justify-center h-full bg-slate-50 text-slate-400 gap-4">
                 <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
                 <span className="font-medium">Loading Map Data...</span>
             </div>
         );
     }
 
+    const selectedIcon = new L.DivIcon({
+        className: 'selected-marker-icon',
+        html: `
+            <div class="relative">
+                <div class="absolute -inset-4 bg-indigo-500/30 rounded-full animate-ping"></div>
+                <div class="relative bg-indigo-600 w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center">
+                    <div class="w-2 h-2 bg-white rounded-full"></div>
+                </div>
+            </div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+    });
+
     return (
-        <div className="relative h-[600px] w-full">
+        <div className="relative h-full w-full">
             <MapContainer 
                 center={mapCenter} 
                 zoom={mapZoom} 
@@ -81,23 +101,30 @@ function MapView({ areas, loading }) {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 
-                {areas.map((area, idx) => (
-                    <Marker 
-                        key={`${area.pincode}-${idx}`} 
-                        position={[area.lat, area.lng]}
-                        icon={createCustomIcon(CORPORATION_COLORS[area.corporation] || '#64748b')}
-                    >
-                        <Popup className="custom-popup">
-                            <div className="p-1">
-                                <h3 className="font-bold text-slate-900 leading-tight mb-1">{area.area}</h3>
-                                <div className="text-xs text-slate-500 space-y-0.5">
-                                    <p><strong>Pincode:</strong> {area.pincode}</p>
-                                    <p><strong>Corp:</strong> {area.corporation}</p>
+                {areas.map((area, idx) => {
+                    const isSelected = selectedArea?.pincode === area.pincode && selectedArea?.area === area.area;
+                    
+                    return (
+                        <Marker 
+                            key={`${area.pincode}-${idx}`} 
+                            position={[area.lat, area.lng]}
+                            icon={isSelected ? selectedIcon : createCustomIcon(CORPORATION_COLORS[area.corporation] || '#64748b')}
+                            eventHandlers={{
+                                click: () => onAreaSelect(area),
+                            }}
+                        >
+                            <Popup className="custom-popup">
+                                <div className="p-1">
+                                    <h3 className="font-bold text-slate-900 leading-tight mb-1">{area.area}</h3>
+                                    <div className="text-xs text-slate-500 space-y-0.5">
+                                        <p><strong>Pincode:</strong> {area.pincode}</p>
+                                        <p><strong>Corp:</strong> {area.corporation}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </Popup>
-                    </Marker>
-                ))}
+                            </Popup>
+                        </Marker>
+                    );
+                })}
 
                 <MapLegend />
             </MapContainer>

@@ -1,3 +1,7 @@
+* {
+    transition: all 150ms ease;
+}
+
 @keyframes slide-in-left {
     from {
         opacity: 0;
@@ -10,18 +14,38 @@
 }
 
 .animate-in {
-    animation: slide-in-left 0.3s ease-out forwards;
+    animation: slide-in-left 0.15s ease-out forwards;
+}
+
+@keyframes marker-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.animate-marker-pulse {
+    animation: marker-pulse 2s infinite;
 }
 
 /* Leaflet Popup Styling */
 .custom-popup .leaflet-popup-content-wrapper {
-    border-radius: 12px;
+    background: #0D1117 !important;
+    border: 1px solid #1C2A3A;
+    border-radius: 4px;
     padding: 0;
     overflow: hidden;
+    color: #E2E8F0;
+    box-shadow: none !important;
 }
 
 .custom-popup .leaflet-popup-content {
-    margin: 12px;
+    margin: 8px;
 }
 
 .custom-popup .leaflet-popup-tip-container {
@@ -30,7 +54,7 @@
 
 /* Custom Marker Hover Effects */
 .custom-div-icon {
-    transition: transform 0.2s ease;
+    transition: transform 150ms ease;
 }
 
 .custom-div-icon:hover {

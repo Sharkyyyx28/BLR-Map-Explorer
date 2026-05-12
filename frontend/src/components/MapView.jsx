@@ -2,17 +2,6 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 const CORPORATION_COLORS = {
     'Bengaluru Central': '#ef4444', 
@@ -22,24 +11,39 @@ const CORPORATION_COLORS = {
     'Bengaluru North': '#8b5cf6'   
 };
 
-const createCustomIcon = (color) => {
+const createCustomIcon = (color, isSelected) => {
+    const pulseHtml = isSelected ? `<div class="absolute -inset-2 rounded-full animate-marker-pulse" style="animation-duration: 2s;"></div>` : '';
+    
     return new L.DivIcon({
         className: 'custom-div-icon',
-        html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
-        popupAnchor: [0, -12]
+        html: `
+            <div class="relative w-full h-full flex items-center justify-center">
+                ${pulseHtml}
+                <div style="
+                    background-color: ${isSelected ? '#fdfffeff' : color}; 
+                    width: ${isSelected ? '20px' : '12px'}; 
+                    height: ${isSelected ? '20px' : '12px'}; 
+                    border-radius: 50%; 
+                    box-shadow: 0 0 10px ${isSelected ? '#f7f7f7ff' : color};
+                    position: relative;
+                    z-index: 10;
+                    border: ${isSelected ? '2px solid #080C14' : 'none'};
+                "></div>
+            </div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16]
     });
 };
 
 const MapLegend = () => {
     return (
-        <div className="absolute bottom-5 right-5 z-[1000] bg-white/90 backdrop-blur-sm p-3 rounded-xl shadow-lg border border-slate-200 text-[11px] text-slate-700">
-            <h4 className="font-bold mb-2 text-xs text-slate-900 uppercase tracking-wider">Corporations</h4>
+        <div className="absolute bottom-6 right-6 z-[1000] bg-[#0D1117]/80 backdrop-blur-md p-4 rounded-lg border border-[#1C2A3A] shadow-xl">
+            <h4 className="font-bold mb-3 text-[10px] text-[#4A6080] uppercase tracking-[0.2em]">Corporations</h4>
             {Object.entries(CORPORATION_COLORS).map(([corp, color]) => (
-                <div key={corp} className="flex items-center mb-1 gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }}></div>
-                    <span>{corp}</span>
+                <div key={corp} className="flex items-center mb-2 gap-3">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}` }}></div>
+                    <span className="text-xs text-[#E2E8F0] tracking-wide">{corp}</span>
                 </div>
             ))}
         </div>
@@ -55,7 +59,6 @@ function ChangeView({ center, zoom }) {
 function MapView({ areas, loading, selectedArea, onAreaSelect }) {
     const defaultCenter = [12.9716, 77.5946]; 
     
-    // Determine center and zoom based on state
     const mapCenter = selectedArea ? [selectedArea.lat, selectedArea.lng] : 
                       areas.length === 1 ? [areas[0].lat, areas[0].lng] : 
                       defaultCenter;
@@ -65,26 +68,12 @@ function MapView({ areas, loading, selectedArea, onAreaSelect }) {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center h-full bg-slate-50 text-slate-400 gap-4">
-                <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-                <span className="font-medium">Loading Map Data...</span>
+            <div className="flex flex-col items-center justify-center h-full bg-[#080C14] text-[#4A6080] gap-4">
+                <div className="w-10 h-10 border-2 border-[#1C2A3A] border-t-[#3B82F6] rounded-full animate-spin shadow-[0_0_15px_#3B82F6]"></div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-[0.3em]">INITIALIZING MAP</span>
             </div>
         );
     }
-
-    const selectedIcon = new L.DivIcon({
-        className: 'selected-marker-icon',
-        html: `
-            <div class="relative">
-                <div class="absolute -inset-4 bg-indigo-500/30 rounded-full animate-ping"></div>
-                <div class="relative bg-indigo-600 w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center">
-                    <div class="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-            </div>
-        `,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
-    });
 
     return (
         <div className="relative h-full w-full">
@@ -92,13 +81,13 @@ function MapView({ areas, loading, selectedArea, onAreaSelect }) {
                 center={mapCenter} 
                 zoom={mapZoom} 
                 scrollWheelZoom={true} 
-                style={{ height: '100%', width: '100%' }}
+                style={{ height: '100%', width: '100%', background: '#080C14' }}
                 zoomControl={false}
             >
                 <ChangeView center={mapCenter} zoom={mapZoom} />
                 <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                 />
                 
                 {areas.map((area, idx) => {
@@ -108,17 +97,17 @@ function MapView({ areas, loading, selectedArea, onAreaSelect }) {
                         <Marker 
                             key={`${area.pincode}-${idx}`} 
                             position={[area.lat, area.lng]}
-                            icon={isSelected ? selectedIcon : createCustomIcon(CORPORATION_COLORS[area.corporation] || '#64748b')}
+                            icon={createCustomIcon(CORPORATION_COLORS[area.corporation] || '#4A6080', isSelected)}
                             eventHandlers={{
                                 click: () => onAreaSelect(area),
                             }}
                         >
                             <Popup className="custom-popup">
-                                <div className="p-1">
-                                    <h3 className="font-bold text-slate-900 leading-tight mb-1">{area.area}</h3>
-                                    <div className="text-xs text-slate-500 space-y-0.5">
-                                        <p><strong>Pincode:</strong> {area.pincode}</p>
-                                        <p><strong>Corp:</strong> {area.corporation}</p>
+                                <div className="p-2">
+                                    <h3 className="font-semibold text-sm text-[#E2E8F0] tracking-wide mb-2">{area.area}</h3>
+                                    <div className="text-[10px] text-[#4A6080] space-y-1.5 font-mono">
+                                        <p><strong className="text-[#3B82F6] font-sans text-[9px] uppercase tracking-widest mr-1">PIN:</strong> {area.pincode}</p>
+                                        <p><strong className="text-[#3B82F6] font-sans text-[9px] uppercase tracking-widest mr-1">ZONE:</strong> {area.corporation}</p>
                                     </div>
                                 </div>
                             </Popup>

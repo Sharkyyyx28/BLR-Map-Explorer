@@ -49,14 +49,14 @@ function App() {
   };
 
   return (
-    <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
-      <header className="bg-white border-b border-slate-200 py-6 px-4 md:px-8">
+    <div className="h-screen bg-[#080C14] text-[#E2E8F0] flex flex-col overflow-hidden font-sans">
+      <header className="bg-[#0D1117] border-b border-[#1C2A3A] py-4 px-6 z-50">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-              BLR <span className="text-indigo-600">Map Explorer</span>
+            <h1 className="text-2xl font-bold tracking-tight">
+              <span className="text-[#4A6080]">BLR</span> <span className="text-[#E2E8F0]">Map Explorer</span>
             </h1>
-            <p className="text-sm text-slate-500 font-medium">
+            <p className="text-[10px] text-[#4A6080] font-bold uppercase tracking-[0.2em] mt-0.5">
               Explore Bangalore's pincodes and areas
             </p>
           </div>
@@ -68,7 +68,7 @@ function App() {
 
       <main className="flex-1 flex overflow-hidden">
         {/* Sidebar Container */}
-        <aside className="hidden lg:block w-80 flex-shrink-0">
+        <aside className="hidden lg:block w-80 flex-shrink-0 bg-[#0D1117] border-r border-[#1C2A3A]">
           <Sidebar 
             areas={allAreas} 
             onAreaSelect={handleAreaSelect} 
@@ -77,7 +77,7 @@ function App() {
         </aside>
 
         {/* Map Container */}
-        <section className="flex-1 relative bg-slate-100">
+        <section className="flex-1 relative bg-[#080C14]">
           <MapView 
             areas={areas} 
             loading={loading} 
@@ -95,17 +95,11 @@ function App() {
           {areas.length !== allAreas.length && (
             <button 
               onClick={handleReset}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] px-6 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-full shadow-2xl hover:bg-slate-800 transition-all active:scale-95 flex items-center gap-2"
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] px-6 py-2 border border-[#3B82F6] text-[#3B82F6] text-[10px] font-bold tracking-[0.2em] uppercase rounded bg-[#080C14]/80 backdrop-blur-sm hover:bg-[#3B82F6] hover:text-[#0A0A0A] transition-all active:scale-95 flex items-center gap-2"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
               <span>Reset Search View</span>
             </button>
           )}
-
-          <div className="absolute top-5 right-5 z-[1000] lg:hidden">
-          </div>
         </section>
       </main>
     </div>

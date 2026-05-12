@@ -10,8 +10,7 @@ function App() {
   const [allAreas, setAllAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Fetch initial data
+  
   useEffect(() => {
     fetchAll();
   }, []);
@@ -19,7 +18,8 @@ function App() {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/api/areas');
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_URL}/api/areas`);
       const data = await res.json();
       setAreas(data);
       setAllAreas(data);

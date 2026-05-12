@@ -16,7 +16,8 @@ function SearchBar({ onSearch }) {
             const isPincode = /^\d+$/.test(query.trim());
             const param = isPincode ? `pincode=${query}` : `area=${query}`;
             
-            const response = await fetch(`http://localhost:8000/api/lookup?${param}`);
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+            const response = await fetch(`${API_URL}/api/lookup?${param}`);
             const data = await response.json();
             
             if (response.ok) {

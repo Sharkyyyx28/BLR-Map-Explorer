@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -10,7 +10,6 @@ const CORPORATION_COLORS = {
     'Bengaluru West': '#f59e0b',    
     'Bengaluru North': '#8b5cf6'   
 };
-
 const createCustomIcon = (color, isSelected) => {
     const pulseHtml = isSelected ? `<div class="absolute -inset-2 rounded-full animate-marker-pulse" style="animation-duration: 2s;"></div>` : '';
     
@@ -50,11 +49,41 @@ const MapLegend = () => {
     );
 };
 
-function ChangeView({ center, zoom }) {
+function ChangeView({ center: [lat, lng], zoom }) {
     const map = useMap();
-    map.setView(center, zoom);
+    
+    React.useEffect(() => {
+        map.setView([lat, lng], zoom);
+    }, [lat, lng, zoom, map]);
+
     return null;
 }
+
+function ZoomHandler() {
+    const map = useMap();
+    const [zoom, setZoom] = React.useState(map.getZoom());
+    
+    useMapEvents({
+        zoom: () => {
+            setZoom(map.getZoom());
+        },
+        zoomend: () => {
+            setZoom(map.getZoom());
+        }
+    });
+
+    return (
+        <div className="absolute bottom-6 left-6 z-[1000] bg-[#0D1117]/85 backdrop-blur-md px-3 py-2 rounded-lg border border-[#1C2A3A] shadow-xl flex items-center gap-3 select-none">
+            <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-[#4A6080]">Zoom</span>
+                <span className="text-xs font-mono font-bold text-[#3B82F6] bg-[#3B82F6]/10 px-1.5 py-0.5 rounded border border-[#3B82F6]/20">
+                    {zoom}
+                </span>
+            </div>
+        </div>
+    );
+}
+
 
 function MapView({ areas, loading, selectedArea, onAreaSelect }) {
     const defaultCenter = [12.9716, 77.5946]; 
@@ -85,6 +114,7 @@ function MapView({ areas, loading, selectedArea, onAreaSelect }) {
                 zoomControl={false}
             >
                 <ChangeView center={mapCenter} zoom={mapZoom} />
+                <ZoomHandler/>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
                     url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -94,6 +124,7 @@ function MapView({ areas, loading, selectedArea, onAreaSelect }) {
                     const isSelected = selectedArea?.pincode === area.pincode && selectedArea?.area === area.area;
                     
                     return (
+                        
                         <Marker 
                             key={`${area.pincode}-${idx}`} 
                             position={[area.lat, area.lng]}

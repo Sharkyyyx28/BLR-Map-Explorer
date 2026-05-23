@@ -1,5 +1,3 @@
-import React from 'react';
-
 function InfoPanel({ area, onClose }) {
     if (!area) return null;
 

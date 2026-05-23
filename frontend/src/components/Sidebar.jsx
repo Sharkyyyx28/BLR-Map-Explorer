@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 function Sidebar({ areas, onAreaSelect, selectedArea }) {
     const [searchTerm, setSearchTerm] = useState('');

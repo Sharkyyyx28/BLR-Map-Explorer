@@ -11,10 +11,6 @@ function App() {
   const [selectedArea, setSelectedArea] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  useEffect(() => {
-    fetchAll();
-  }, []);
-
   const fetchAll = async () => {
     setLoading(true);
     try {
@@ -29,6 +25,10 @@ function App() {
       setLoading(false);
     }
   };
+  
+  useEffect(() => {
+    fetchAll();
+  }, []);
 
   const handleSearch = (results) => {
     setAreas(results);
